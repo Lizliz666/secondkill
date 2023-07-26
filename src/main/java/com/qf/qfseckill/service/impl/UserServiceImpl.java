@@ -88,6 +88,11 @@ TbUserMapper tbUserMapper;
         return  new BaseResp().OK(token,null);
     }
 
+    /**
+     * 注册的相关业务实现
+     * @param userReq
+     * @return
+     */
     @Override
     public BaseResp register(UserReq userReq) {
 
