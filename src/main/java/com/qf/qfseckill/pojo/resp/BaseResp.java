@@ -21,4 +21,6 @@ public class BaseResp {
     public BaseResp FAIL(String msg){
         return new BaseResp(0,msg,null,null);
     }
+
+
 }
