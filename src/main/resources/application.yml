@@ -1,0 +1,16 @@
+spring:
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://39.106.22.111:3307/day7_25?characeterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+        username: root
+        password: 123456
+    mail:
+        username: 1757832150@qq.com
+        password: msrcaawtesbidhjg
+        host: smtp.qq.com
+mybatis-plus:
+    type-aliases-package: com.qf.entity
+    configuration:
+        log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+jwt:
+    key: qf
