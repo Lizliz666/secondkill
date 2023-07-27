@@ -10,5 +10,8 @@ public class RedisKey {
 
     public static final String GOODS_LIST = "goods_list";
     public static final String SHOP_CART = "shop_cart:";
+    public static final String SECKILL_GOODS = "seckill_goods:";
+    public static final String SECKILL_NUM = "seckill_num:";
+    public static final String SECKILL_LOCK = "seckill_lock:";
 
 }
