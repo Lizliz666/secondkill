@@ -10,13 +10,11 @@ import lombok.NoArgsConstructor;
 
 import java.util.Date;
 import java.io.Serializable;
-
 /**
- * (TbGoods)实体类
- *
- * @author makejava
- * @since 2023-07-26 17:38:47
+ * @author 严玉恒Liz
+ * @date 2023/7/26 17:42
  */
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,19 +24,31 @@ public class TbGoods implements Serializable {
     @TableId(value = "goods_id",type = IdType.AUTO)
 
     private Integer goodsId;
+    @TableField("goods_name")
     
     private String goodsName;
-    
+    @TableField("goods_image")
+
+
     private String goodsImage;
-    
+    @TableField("goods_desc")
+
+
     private String goodsDesc;
-    
+    @TableField("goods_price")
+
     private Double goodsPrice;
-    
+    @TableField("goods_num")
+
+
     private Integer goodsNum;
-    
+    @TableField("create_time")
+
+
     private Date createTime;
-    
+    @TableField("update_time")
+
+
     private Date updateTime;
 
     private String path;

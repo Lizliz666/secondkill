@@ -2,6 +2,7 @@ package com.qf.qfseckill.service.impl;
 
 import com.qf.qfseckill.config.RedisKey;
 import com.qf.qfseckill.dao.GoodsMapper;
+import com.qf.qfseckill.dao.RotationMapper;
 import com.qf.qfseckill.pojo.entity.TbGoods;
 import com.qf.qfseckill.pojo.resp.BaseResp;
 import com.qf.qfseckill.service.GoodsService;
@@ -25,6 +26,7 @@ public class GoodsServiceImpl implements GoodsService {
         Boolean aBoolean = redisTemplate.hasKey(RedisKey.GOODS_LIST);
         if (!aBoolean){
             List<TbGoods> tbGoods = goodsMapper.selectList(null);
+            System.out.println(tbGoods);
             for (TbGoods goods:tbGoods){
                 redisTemplate.opsForZSet().add(RedisKey.GOODS_LIST,goods,goods.getGoodsPrice());
             }
