@@ -1,14 +1,16 @@
 package com.qf.qfseckill.service.impl;
 
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.jwt.JWT;
 import cn.hutool.jwt.JWTUtil;
 import com.qf.qfseckill.config.RedisKey;
+import com.qf.qfseckill.dao.TbSeckillOrderMapper;
 import com.qf.qfseckill.pojo.entity.TbSeckillGoods;
+import com.qf.qfseckill.pojo.entity.TbSeckillOrder;
 import com.qf.qfseckill.pojo.req.SeckillReq;
 import com.qf.qfseckill.pojo.resp.BaseResp;
 import com.qf.qfseckill.service.SeckillService;
 import com.qf.qfseckill.utils.DateUtil;
-
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,8 @@ public class SeckillServiceImpl implements SeckillService {
     @Autowired
     RedissonClient redissonClient;
 
+    @Autowired
+    TbSeckillOrderMapper tbSeckillOrderMapper;
     @Override
     public BaseResp findSeckill(SeckillReq req) {
         //将req中的date转为yyyyMMddHH格式。
@@ -80,11 +84,11 @@ public class SeckillServiceImpl implements SeckillService {
             //阻塞锁
             //lock.lock();
             if (b) {
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    Thread.sleep(5000);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
                 String s = stringRedisTemplate.opsForValue().get(RedisKey.SECKILL_NUM + key + ":" + req.getGoodId());
                 if (StringUtils.isEmpty(s)) {
                     return new BaseResp().FAIL("没有秒杀商品！");
@@ -100,12 +104,20 @@ public class SeckillServiceImpl implements SeckillService {
                 TbSeckillGoods o = (TbSeckillGoods) redisTemplate.boundHashOps(RedisKey.SECKILL_GOODS + key).get(req.getGoodId());
                 o.setStockCount(o.getStockCount() - 1);
                 redisTemplate.boundHashOps(RedisKey.SECKILL_GOODS + key).put(req.getGoodId(), o);
-                //生成订单
-                //让用户进行支付
-                //将锁进行释放
-                //stringRedisTemplate.delete(RedisKey.SEKILL_LOCK);
-                // lock.unlock();
-                return new BaseResp().OK(null, null);
+                //1.生成交易流水单号
+                long transcationId = IdUtil.getSnowflakeNextId();
+                //说明已经请求支付包或者微信成功。生成了form表单。我们就需要在这里进行订单的存储操作。
+                TbSeckillOrder tbSeckillOrder = new TbSeckillOrder();
+                tbSeckillOrder.setMoney(o.getCostPrice());
+                tbSeckillOrder.setUserId(uid);
+                tbSeckillOrder.setStatus("0");
+                tbSeckillOrder.setGoodsId(o.getGoodsId());
+                tbSeckillOrder.setSeckillId(o.getId());
+                tbSeckillOrder.setTransactionId(transcationId+"");
+
+                tbSeckillOrderMapper.insert(tbSeckillOrder);
+
+                return new BaseResp().OK(transcationId+"", null);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -115,6 +127,6 @@ public class SeckillServiceImpl implements SeckillService {
                 lock.unlock();
             }
         }
-       return new BaseResp().FAIL("太多请求了,请稍后重试");
+       return new BaseResp().FAIL("Too manay seckill,pleas hold on");
     }
 }
